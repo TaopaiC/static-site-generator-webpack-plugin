@@ -2,10 +2,11 @@ var evaluate = require('eval');
 var path = require('path');
 var Promise = require('bluebird');
 
-function StaticSiteGeneratorWebpackPlugin(renderSourcePath, outputPaths, locals) {
+function StaticSiteGeneratorWebpackPlugin(renderSourcePath, outputPaths, locals, scope) {
   this.renderSourcePath = renderSourcePath;
   this.outputPaths = Array.isArray(outputPaths) ? outputPaths : [outputPaths];
   this.locals = locals;
+  this.scope = scope;
 }
 
 StaticSiteGeneratorWebpackPlugin.prototype.apply = function(compiler) {
@@ -24,7 +25,7 @@ StaticSiteGeneratorWebpackPlugin.prototype.apply = function(compiler) {
       var assets = getAssetsFromCompiler(compiler);
 
       var source = asset.source();
-      var render = evaluate(source, /* filename: */ undefined, /* scope: */ undefined, /* includeGlobals: */ true);
+      var render = evaluate(source, /* filename: */ undefined, /* scope: */ self.scope, /* includeGlobals: */ true);
 
       renderPromises = self.outputPaths.map(function(outputPath) {
         var outputFileName = path.join(outputPath, '/index.html');
